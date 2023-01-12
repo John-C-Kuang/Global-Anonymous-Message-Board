@@ -5,14 +5,31 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
 import java.sql.SQLTimeoutException
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 fun main() {
 
     // Connect to DB
     val connection = connectToDB()
 
-    // Spin up the server
+    // Spin up the server and start to listen
+    // Generate client proxy upon connection request
 
+
+    // Playground
+//    val service = BasicServiceImpl(connection)
+//    service.sendText("123455")
+//    val zoneId = ZoneId.of("America/New_York")
+//    val afterTime = LocalDateTime.parse("2023-01-12 15:10:37.570",
+//        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")).atZone(zoneId)
+//    val result = service.recvPrevMessages(ZonedDateTime.from(afterTime))
+//    println(result.message)
+//    for (i in result.payload!!) {
+//        println(i)
+//    }
 
 
 }
@@ -24,7 +41,7 @@ fun main() {
 fun connectToDB(): Connection {
     try {
         val path = "jdbc:sqlite:../GAMA.db"
-        return  DriverManager.getConnection(path)
+        return DriverManager.getConnection(path)
     } catch(e: Exception) {
         when (e) {
             is SQLTimeoutException -> throw IllegalStateException(e.message)

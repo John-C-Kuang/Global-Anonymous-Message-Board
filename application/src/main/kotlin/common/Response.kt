@@ -1,7 +1,6 @@
 package common
 
-import com.google.gson.JsonElement
-import com.google.gson.JsonPrimitive
+import server.MessageModel
 
 
 /**
@@ -11,6 +10,7 @@ enum class ResponseType{
     OK, FAIL
 }
 
+
 /**
  * Response type of the server.
  * -
@@ -19,21 +19,24 @@ enum class ResponseType{
  */
 abstract class ServerResponse(
     val type: ResponseType,
-    open val content: JsonElement
+    val message: String,
+    open val payload: List<MessageModel>? = null
 )
 
 /**
  * Represents the response from the server when data is successfully processed.
  */
-class ServerOKResponse(override val content: JsonElement): ServerResponse(
+class ServerOKResponse(val content: String, override val payload: List<MessageModel>?): ServerResponse(
     type = ResponseType.OK,
-    content = content
+    message = content,
+    payload = payload
 )
 
 /**
  * Represents the response from the server when data failed to processed.
  */
-class ServerFAILResponse(override val content: JsonElement): ServerResponse(
+class ServerFAILResponse(val content: String, override val payload: List<MessageModel>?): ServerResponse(
     type = ResponseType.FAIL,
-    content = content
+    message = content,
+    payload = payload
 )
