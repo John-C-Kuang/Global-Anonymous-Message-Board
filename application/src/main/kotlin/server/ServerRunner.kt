@@ -20,7 +20,7 @@ fun main() {
 
 
     // Playground
-//    val service = BasicServiceImpl(connection)
+
 //    service.sendText("123455")
 //    val zoneId = ZoneId.of("America/New_York")
 //    val afterTime = LocalDateTime.parse("2023-01-12 15:10:37.570",

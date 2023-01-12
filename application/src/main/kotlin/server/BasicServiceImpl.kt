@@ -83,13 +83,8 @@ class BasicServiceImpl(private val connection: Connection): BasicService {
 
     override fun login(username: String, password: String): ServerResponse {
         return try {
-            val query = "SELECT * FROM USER WHERE name = ? AND password = ?"
-            val preparedStatement = connection.prepareStatement(query)
-            preparedStatement.setString(1, username)
-            preparedStatement.setString(2, password)
-            val result = preparedStatement.executeQuery()
-            if (result.fetchSize == 0) throw IllegalArgumentException("Incorrect login credentials")
-            if (result.fetchSize > 1) throw IllegalArgumentException("An unknown error has occured")
+            loginHelper(username, password)
+            // Do something to client proxy later
             ServerOKResponse(
                 content = "successfully logged in",
                 payload = null
@@ -98,10 +93,21 @@ class BasicServiceImpl(private val connection: Connection): BasicService {
             // 1. Already logged in
             // 2. Incorrect credentials
             ServerFAILResponse(
-                content = failMessage("something"),
+//                content = failMessage("something"),
+                content = e.message!!,
                 payload = null
             )
         }
+    }
+
+    private fun loginHelper(username: String, password: String) {
+        val query = "SELECT * FROM USER WHERE name = ? AND password = ?"
+        val preparedStatement = connection.prepareStatement(query)
+        preparedStatement.setString(1, username)
+        preparedStatement.setString(2, password)
+        val result = preparedStatement.executeQuery()
+        if (!result.next()) throw IllegalArgumentException("Incorrect login credentials")
+        if (result.next()) throw IllegalArgumentException("An unknown error has occurred")
     }
 
     override fun signup(username: String, password: String): ServerResponse {
@@ -110,13 +116,13 @@ class BasicServiceImpl(private val connection: Connection): BasicService {
             val checkPreparedStatemenet = connection.prepareStatement(checkQuery)
             checkPreparedStatemenet.setString(1, username)
             val checkResult = checkPreparedStatemenet.executeQuery()
-            if (checkResult.fetchSize != 0) throw IllegalArgumentException("Username already used")
+            if (checkResult.next()) throw IllegalArgumentException("Username already used")
 
             val requestQuery = "INSERT INTO USER(name, password) VALUES(?, ?)"
             val requestPreparedStatement = connection.prepareStatement(requestQuery)
             requestPreparedStatement.setString(1, username)
-            requestPreparedStatement.setString(1, username)
-            requestPreparedStatement.executeQuery()
+            requestPreparedStatement.setString(2, password)
+            requestPreparedStatement.executeUpdate()
 
             ServerOKResponse(
                 content = "Account successfully created",
@@ -124,7 +130,8 @@ class BasicServiceImpl(private val connection: Connection): BasicService {
             )
         } catch (e: Exception) {
             ServerFAILResponse(
-                content = failMessage("something"),
+//                content = failMessage("something"),
+                content = e.message!!,
                 payload = null
             )
         }
